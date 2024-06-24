@@ -14,7 +14,7 @@ KELOMPOK:
 
 ## DIAGRAM
 
-![Diagram](lib\setting\assets\diagram.drawio.png)
+![Diagram](lib/setting/assets/diagram.drawio.png)
 
 ## FIGMA
 
