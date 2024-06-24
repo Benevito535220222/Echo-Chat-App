@@ -18,6 +18,15 @@ class _AddContactState extends State<AddContact> {
   void addContact(String contactEmail) async {
     User? user = _firebaseAuth.currentUser;
 
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('User not authenticated.'),
+        ),
+      );
+      return;
+    }
+
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('users')
@@ -30,7 +39,7 @@ class _AddContactState extends State<AddContact> {
 
         await FirebaseFirestore.instance
             .collection('users')
-            .doc(user?.uid)
+            .doc(user.uid)
             .update({
           'contacts': FieldValue.arrayUnion([contactID])
         });
@@ -39,21 +48,21 @@ class _AddContactState extends State<AddContact> {
             .collection('users')
             .doc(contactID)
             .update({
-          'contacts': FieldValue.arrayUnion([user?.uid])
+          'contacts': FieldValue.arrayUnion([user.uid])
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Contact added successfully.'),
           ),
         );
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomePage()),
+          MaterialPageRoute(builder: (context) => const HomePage()),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Contact not found.'),
           ),
         );
@@ -61,7 +70,7 @@ class _AddContactState extends State<AddContact> {
     } catch (e) {
       print('Error adding contact: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('An error occurred while adding the contact.'),
         ),
       );
@@ -70,129 +79,90 @@ class _AddContactState extends State<AddContact> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(
-          backgroundColor: const Color.fromARGB(255, 44, 44, 44),
-          title: const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 44, 44, 44),
+        title: const Text(
+          'Contact Adding',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.normal,
+            fontSize: 18,
+          ),
+        ),
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      body: SingleChildScrollView(
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              colors: [
+                Color.fromARGB(255, 81, 81, 81),
+                Color.fromARGB(255, 40, 40, 40),
+                Color.fromARGB(255, 21, 21, 21),
+              ],
+            ),
+          ),
+          child: Column(
             children: [
-              Text(
-                'Contact Adding',
-                style: TextStyle(
+              const SizedBox(height: 20),
+              CircleAvatar(
+                radius: 175, // Updated radius for better display
+                backgroundImage: const AssetImage('lib/setting/assets/avatar.png'),
+                backgroundColor: Colors.white,
+              ),
+              const SizedBox(height: 20),
+              Container(
+                width: double.infinity,
+                decoration: const BoxDecoration(
                   color: Colors.white,
-                  fontWeight: FontWeight.normal,
-                  fontSize: 18,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(50),
+                    topRight: Radius.circular(50),
+                  ),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 25),
+                child: Column(
+                  children: [
+                    MyTextField(
+                      controller: contactController,
+                      hintText: 'Enter friend\'s email',
+                      obscureText: false,
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        print("adding contact");
+                        addContact(contactController.text);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(255, 200, 200, 200),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                      ),
+                      child: const Text(
+                        "Add contact",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.0,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
-          ),
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              // Add your back button logic here
-              Navigator.pop(context);
-            },
-          ),
-        ),
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-        body: SingleChildScrollView(
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(begin: Alignment.topCenter, colors: [
-                Color.fromARGB(255, 81, 81, 81)!,
-                const Color.fromARGB(255, 40, 40, 40)!,
-                const Color.fromARGB(255, 21, 21, 21)!
-              ]),
-            ),
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-                Container(
-                  height: 400,
-                  width: MediaQuery.of(context).size.width,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
-                  child: const CircleAvatar(
-                    radius: 350,
-                    backgroundImage:
-                        AssetImage('lib/setting/assets/avatar.png'),
-                    backgroundColor: Color.fromARGB(255, 255, 255, 255),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Container(
-                  height: MediaQuery.of(context).size.height - 496,
-                  width: MediaQuery.of(context).size.width,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(50),
-                      topRight: Radius.circular(50),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 50),
-                      Container(
-                        decoration: const BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(20),
-                            topRight: Radius.circular(20),
-                          ),
-                          color: Color.fromARGB(255, 255, 255, 255),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color.fromRGBO(255, 255, 255, 0.294),
-                              blurRadius: 20,
-                              offset: Offset(0, 10),
-                            ),
-                          ],
-                        ),
-                        alignment: Alignment.center,
-                        height: 40,
-                        width: 400,
-                        child: MyTextField(
-                          controller: contactController,
-                          hintText: 'Enter friend"s email',
-                          obscureText: false,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Container(
-                        width: 400,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            print("adding contact");
-                            addContact(contactController.text);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color.fromARGB(255, 200, 200, 200),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                            ),
-                          ),
-                          child: Text(
-                            "Add contact",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16.0,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
           ),
         ),
       ),

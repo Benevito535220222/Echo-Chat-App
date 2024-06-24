@@ -10,12 +10,12 @@ KELOMPOK:
 
 ## JIRA
 
-![Jira](lib\setting\assets\jira.png)
+![Jira](lib/setting/assets/jira.png)
 
 ## DIAGRAM
 
-![Diagram](lib\setting\assets\diagram.png)
+![Diagram](lib\setting\assets\diagram.drawio.png)
 
 ## FIGMA
 
-![Figma](lib\setting\assets\figma.png)
+![Figma](lib/setting/assets/figma.png)
