@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter/scheduler.dart';
 
 class ChatPage extends StatefulWidget {
   final String receiverUserEmail;
@@ -30,6 +31,7 @@ class _ChatPageState extends State<ChatPage> {
   final ChatService _chatService = ChatService();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseStorage storage = FirebaseStorage.instance;
+  final ScrollController _scrollController = ScrollController();
 
   String imageUrl = '';
   String? lastTappedMessage;
@@ -44,13 +46,13 @@ class _ChatPageState extends State<ChatPage> {
       setState(() {
         lastTappedMessage = null;
       });
+      _scrollToBottom();
     }
   }
 
   void sendImage(image) async {
     await _chatService.sendMessage(widget.receiverUserID, '', image);
-
-    // _messageController.clear();
+    _scrollToBottom();
   }
 
   void openMediaDialog() {
@@ -162,9 +164,14 @@ class _ChatPageState extends State<ChatPage> {
                 backgroundImage: NetworkImage(widget.imageUrl),
               ),
             ),
-            const SizedBox(width: 8),
-            Text(widget.receiverUserEmail,
-                style: TextStyle(color: Colors.white)),
+            const SizedBox(width: 4),
+            Expanded(
+              child: Text(
+                widget.receiverUserEmail,
+                style: TextStyle(color: Colors.white),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
       ),
@@ -199,7 +206,12 @@ class _ChatPageState extends State<ChatPage> {
               child: Text('This is a start of your new conversation!!'));
         }
 
+        SchedulerBinding.instance.addPostFrameCallback((_) {
+          _scrollToBottom();
+        });
+
         return ListView(
+          controller: _scrollController,
           children: snapshot.data!.docs
               .map((document) => _buildMessageItem(document))
               .toList(),
@@ -282,5 +294,15 @@ class _ChatPageState extends State<ChatPage> {
         ],
       ),
     );
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        _scrollController.jumpTo(
+          _scrollController.position.maxScrollExtent,
+        );
+      });
+    }
   }
 }
