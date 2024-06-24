@@ -121,8 +121,9 @@ class _AddContactState extends State<AddContact> {
                   ),
                   child: const CircleAvatar(
                     radius: 350,
-                    backgroundImage: NetworkImage(
-                      'https://cdn.discordapp.com/attachments/1035813890535206975/1180443968887078922/connect.png?ex=657d711d&is=656afc1d&hm=f96911fb1aed3c69e089c4bde490aee7ad34f31c1be55e1c930d147bee7b2046&',
+                    backgroundImage:
+                        AssetImage('lib/setting/assets/avatar.png'),
+                    backgroundColor: Color.fromARGB(255, 255, 255, 255),
                     ),
                   ),
                 ),
