@@ -8,6 +8,10 @@ KELOMPOK:
 - Willy Michael         535220216
 - Benevito Kevin        535220222
 
+## VIDEO PRESETASI
+
+https://youtu.be/fxCnS3Cc1J8?feature=shared
+
 ## JIRA
 
 ![Jira](lib/setting/assets/jira.png)
